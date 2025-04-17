@@ -1,4 +1,4 @@
-function ProductRow({ product }) {
+function ProductRow({ product, onDelete }) {
   const productName = product.stocked ? (
     product.name
   ) : (
@@ -6,7 +6,8 @@ function ProductRow({ product }) {
   );
   return (
     <tr>
-      <td style={{width: "50%"}}>{productName}</td>
+      <td><button onClick={(e) => onDelete(product.name)}>x</button></td>
+      <td>{productName}</td>
       <td>{product.price}</td>
     </tr>
   );

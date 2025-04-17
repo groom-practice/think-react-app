@@ -1,7 +1,7 @@
 import ProductCategoryRow from "./ProductCategoryRow";
 import ProductRow from "./ProductRow";
 
-function ProductTable({ products, filterText, inStockOnly }) {
+function ProductTable({ products, filterText, inStockOnly, onDelete }) {
   const rows = [];
   let lastCategory = null;
 
@@ -21,13 +21,14 @@ function ProductTable({ products, filterText, inStockOnly }) {
         />
       );
     }
-    rows.push(<ProductRow product={product} key={product.name + index} />);
+    rows.push(<ProductRow product={product} key={product.name + index} onDelete={onDelete} />);
     lastCategory = product.category;
   });
   return (
     <table style={{ width: "100%" }}>
       <thead>
         <tr>
+          <th>Del</th>
           <th>Name</th>
           <th>Price</th>
         </tr>

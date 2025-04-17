@@ -43,10 +43,14 @@ export default function App() {
     setProducts(newProducts);
   };
 
+  const handleDelete = (productName) => {
+    setProducts(products.filter(p => p.name !== productName));
+  }
+
   return (
     <main>
       <AddProducts onAddProduct={handleAddProduct} />
-      <FilterableProductTable products={products} />
+      <FilterableProductTable products={products} onDelete={handleDelete} />
     </main>
   );
 }

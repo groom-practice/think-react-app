@@ -10,13 +10,79 @@ const PRODUCTS = [
 ];
 
 export default function App() {
-  return <FilterableProductTable products={PRODUCTS} />;
+  const [products, setProducts] = useState(PRODUCTS);
+
+  const handleAddProduct = (category, name, price, stocked) => {
+    const selectCategoryProducts = products.filter(
+      (product) => product.category === category
+    );
+    const unSelectCategoryProducts = products.filter(
+      (product) => product.category !== category
+    );
+
+    selectCategoryProducts.push({
+      category,
+      price,
+      stocked,
+      name,
+    });
+
+    const joinProducts = [
+      ...selectCategoryProducts,
+      ...unSelectCategoryProducts,
+    ];
+
+    // Fruits 카테고리의 제품을 맨 위로 올리기
+    const newProducts = [
+      ...joinProducts.filter((product) => product.category === "Fruits"),
+      ...joinProducts.filter((product) => product.category !== "Fruits"),
+    ];
+
+    setProducts(newProducts);
+  };
+  return (
+    <main>
+      <AddProduct onAddProduct={handleAddProduct} />
+      <FilterableProductTable products={products} />
+    </main>
+  );
+}
+
+function AddProduct({ onAddProduct }) {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const category = e.target[0].value;
+    const name = e.target[1].value;
+    const price = e.target[2].value;
+    const stocked = e.target[3].checked;
+    onAddProduct(category, name, price, stocked);
+  };
+  return (
+    <form onSubmit={handleSubmit}>
+      <select className="category">
+        <option value="Fruits">Fruits</option>
+        <option value="Vegetables">Vegetables</option>
+      </select>
+      <input type="text" className="name" />
+      <select className="price">
+        <option value="$1">$1</option>
+        <option value="$2">$2</option>
+        <option value="$3">$3</option>
+        <option value="$4">$4</option>
+        <option value="$5">$5</option>
+      </select>
+      <label>
+        <input type="checkbox" className="stocked" />
+        Stock Status
+      </label>
+      <button type="submit">Add</button>
+    </form>
+  );
 }
 
 function FilterableProductTable({ products }) {
   const [filterText, setFilterText] = useState("");
   const [inStockOnly, setInStockOnly] = useState(false);
-  const [newProduct, setNewProduct] = useState(products);
 
   const handleAddNewData = (newData) => {
     document;
@@ -29,11 +95,9 @@ function FilterableProductTable({ products }) {
         onFilterTextChange={setFilterText}
         inStockOnly={inStockOnly}
         onInStockOnly={setInStockOnly}
-        products={newProduct}
-        onAddNewData={handleAddNewData}
       />
       <ProductTable
-        products={newProduct}
+        products={products}
         filterText={filterText}
         inStockOnly={inStockOnly}
       />
@@ -46,12 +110,9 @@ function SearchBar({
   onFilterTextChange,
   inStockOnly,
   onInStockOnly,
-  products,
-  onAddNewData,
 }) {
   return (
     <form>
-      <AddProduct products={products} onAddNewData={onAddNewData} />
       <input
         type="text"
         vlaue={filterText}
@@ -67,39 +128,6 @@ function SearchBar({
         />
         &nbsp;Only show products in stock
       </label>
-    </form>
-  );
-}
-
-function AddProduct({ products, onAddNewData }) {
-  const rows = [];
-  let lastCategory = null;
-  products.forEach((product) => {
-    if (product.category !== lastCategory) {
-      rows.push(product.category);
-    }
-    lastCategory = product.category;
-  });
-  return (
-    <form id="addForm" onSubmit={onAddNewData}>
-      <select className="category">
-        {rows.map((v) => (
-          <option value={v}>{v}</option>
-        ))}
-      </select>
-      <input type="text" className="name" />
-      <select className="price">
-        <option value="$1">$1</option>
-        <option value="$2">$2</option>
-        <option value="$3">$3</option>
-        <option value="$4">$4</option>
-        <option value="$5">$5</option>
-      </select>
-      <label>
-        <input type="checkbox" className="stocked" />
-        Stock Status
-      </label>
-      <button type="submit">Add</button>
     </form>
   );
 }

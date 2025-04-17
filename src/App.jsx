@@ -11,60 +11,60 @@ const PRODUCTS = [
 
 export default function App() {
   const [products, setProducts] = useState(PRODUCTS);
-
-  const handleAddProduct = (category, name, price, stocked) => {
-    const selectCategoryProducts = products.filter(
-      (product) => product.category === category
+  let handleAddProduct = (obj) => {
+    const selectCategory = products.filter(
+      (p) => p.category === obj["category"]
     );
-    const unSelectCategoryProducts = products.filter(
-      (product) => product.category !== category
+    const unSelectCategory = products.filter(
+      (p) => p.category !== obj["category"]
     );
-
-    selectCategoryProducts.push({
-      category,
-      price,
-      stocked,
-      name,
-    });
-
-    const joinProducts = [
-      ...selectCategoryProducts,
-      ...unSelectCategoryProducts,
+    selectCategory.push(obj);
+    const join = [...selectCategory, ...unSelectCategory];
+    const newArr = [
+      ...join.filter((v) => v.category === "Fruits"),
+      ...join.filter((v) => v.category !== "Fruits"),
     ];
-
-    // Fruits 카테고리의 제품을 맨 위로 올리기
-    const newProducts = [
-      ...joinProducts.filter((product) => product.category === "Fruits"),
-      ...joinProducts.filter((product) => product.category !== "Fruits"),
-    ];
-
-    setProducts(newProducts);
+    setProducts(newArr);
   };
+
   return (
     <main>
-      <AddProduct onAddProduct={handleAddProduct} />
+      <AddProduct products={products} onAddProduct={handleAddProduct} />
       <FilterableProductTable products={products} />
     </main>
   );
 }
 
-function AddProduct({ onAddProduct }) {
-  const handleSubmit = (e) => {
+function AddProduct({ products, onAddProduct }) {
+  const rows = [];
+  let lastCategory = null;
+  products.forEach((product) => {
+    if (product.category !== lastCategory) {
+      rows.push(product.category);
+    }
+    lastCategory = product.category;
+  });
+
+  const submitFn = (e) => {
     e.preventDefault();
-    const category = e.target[0].value;
-    const name = e.target[1].value;
-    const price = e.target[2].value;
-    const stocked = e.target[3].checked;
-    onAddProduct(category, name, price, stocked);
+    let data = new FormData(addForm);
+    let obj = {};
+    for (let [key, value] of data) {
+      obj[key] = value;
+    }
+    obj["stocked"] = e.target["stocked"].checked ? true : false;
+    onAddProduct(obj);
   };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <select className="category">
-        <option value="Fruits">Fruits</option>
-        <option value="Vegetables">Vegetables</option>
+    <form id="addForm" onSubmit={submitFn}>
+      <select name="category">
+        {rows.map((v) => (
+          <option value={v}>{v}</option>
+        ))}
       </select>
-      <input type="text" className="name" />
-      <select className="price">
+      <input type="text" name="name" />
+      <select name="price">
         <option value="$1">$1</option>
         <option value="$2">$2</option>
         <option value="$3">$3</option>
@@ -72,7 +72,7 @@ function AddProduct({ onAddProduct }) {
         <option value="$5">$5</option>
       </select>
       <label>
-        <input type="checkbox" className="stocked" />
+        <input type="checkbox" name="stocked" />
         Stock Status
       </label>
       <button type="submit">Add</button>
@@ -83,10 +83,6 @@ function AddProduct({ onAddProduct }) {
 function FilterableProductTable({ products }) {
   const [filterText, setFilterText] = useState("");
   const [inStockOnly, setInStockOnly] = useState(false);
-
-  const handleAddNewData = (newData) => {
-    document;
-  };
 
   return (
     <div style={{ padding: "20px" }}>
@@ -133,8 +129,18 @@ function SearchBar({
 }
 
 function ProductTable({ products, filterText, inStockOnly }) {
+  const [showAndHide, setShowAndHide] = useState([]);
   const rows = [];
   let lastCategory = null;
+
+  let handleShow = (category) => {
+    let newArr = [...showAndHide, category];
+    let data = newArr.filter((item, _, self) => {
+      return self.indexOf(item) === self.lastIndexOf(item);
+    });
+
+    setShowAndHide(data);
+  };
 
   products.forEach((product) => {
     // 겹치는 문자가 없으면 -1
@@ -152,12 +158,21 @@ function ProductTable({ products, filterText, inStockOnly }) {
         <ProductCategoryRow
           category={product.category}
           key={product.category}
+          onShow={handleShow}
+          showAndHide={showAndHide}
         />
       );
     }
-    rows.push(<ProductRow product={product} key={product.name} />);
+    rows.push(
+      <ProductRow
+        product={product}
+        key={product.name}
+        showAndHide={showAndHide}
+      />
+    );
     lastCategory = product.category;
   });
+
   return (
     <table>
       <thead>
@@ -171,22 +186,37 @@ function ProductTable({ products, filterText, inStockOnly }) {
   );
 }
 
-function ProductCategoryRow({ category }) {
+function ProductCategoryRow({ category, onShow, showAndHide }) {
+  let showData = "";
+  if (showAndHide.length === 0) {
+    showData = "▲";
+  } else {
+    showData = showAndHide.includes(category) ? "▼" : "▲";
+  }
   return (
     <tr>
-      <th colSpan={2}>{category}</th>
+      <th colSpan={2} onClick={() => onShow(category)}>
+        {category} <span>{showData}</span>
+      </th>
     </tr>
   );
 }
 
-function ProductRow({ product }) {
+function ProductRow({ product, showAndHide }) {
+  let showData = "";
+  if (showAndHide.length === 0) {
+    showData = "";
+  } else {
+    showData = showAndHide.includes(product.category) ? "hidden" : "";
+  }
+
   const prductName = product.stocked ? (
     product.name
   ) : (
     <span style={{ color: "red" }}>{product.name}</span>
   );
   return (
-    <tr>
+    <tr hidden={showData}>
       <td>{prductName}</td>
       <td>{product.price}</td>
     </tr>

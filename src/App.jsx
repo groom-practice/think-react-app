@@ -12,6 +12,14 @@ const PRODUCTS = [
 export default function App() {
   const [products, setProducts] = useState(PRODUCTS);
 
+  /* 아이템 삭제 기능 추가 */
+  const handleDeleteProduct = (nameToDelete) => {
+    const updated = products.filter(
+      (product) => product.name.toLowerCase() !== nameToDelete.toLowerCase()
+    );
+    setProducts(updated);
+  };
+
   const handleAddProduct = (category, name, price, stocked) => {
     const selectCategoryProducts = products.filter(
       (product) => product.category === category
@@ -32,7 +40,6 @@ export default function App() {
       ...unSelectCategoryProducts,
     ];
 
-    // Fruits 카테고리의 제품을 맨 위로 올리기
     const newProducts = [
       ...joinProducts.filter((product) => product.category === "Fruits"),
       ...joinProducts.filter((product) => product.category !== "Fruits"),
@@ -42,9 +49,9 @@ export default function App() {
   };
 
   return (
-    <main>
+    <main style={{padding: "20px"}}>
       <AddProducts onAddProduct={handleAddProduct} />
-      <FilterableProductTable products={products} />
+      <FilterableProductTable products={products} onDeleteProduct={handleDeleteProduct} />
     </main>
   );
 }
@@ -81,9 +88,21 @@ function AddProducts({ onAddProduct }) {
   );
 }
 
-function FilterableProductTable({ products }) {
+function FilterableProductTable({ products, onDeleteProduct }) {
   const [filterText, setFilterText] = useState("");
   const [inStockOnly, setInStockOnly] = useState(false);
+
+  const hasMatch = products.some(
+    (p) => p.name.toLowerCase() === filterText.toLowerCase()
+  );
+
+  const handleDelete = () => {
+    if (hasMatch) {
+      onDeleteProduct(filterText);
+      setFilterText("");
+    }
+  };
+
   return (
     <div>
       <SearchBar
@@ -91,6 +110,8 @@ function FilterableProductTable({ products }) {
         inStockOnly={inStockOnly}
         onFilterTextChange={setFilterText}
         onInStockOnlyChange={setInStockOnly}
+        onDelete={handleDelete}
+        hasMatch={hasMatch}
       />
       <ProductTable
         products={products}
@@ -106,6 +127,8 @@ function SearchBar({
   inStockOnly,
   onFilterTextChange,
   onInStockOnlyChange,
+  onDelete,
+  hasMatch
 }) {
   return (
     <form>
@@ -115,6 +138,21 @@ function SearchBar({
         onChange={(e) => onFilterTextChange(e.target.value)}
         placeholder="Search..."
       />
+      <button
+        type="button"
+        onClick={onDelete}
+        disabled={!hasMatch}
+        style={{
+          backgroundColor: hasMatch ? "#ff4d4d" : "#ccc",
+          color: "#fff",
+          border: "none",
+          marginLeft: "10px",
+          padding: "5px 10px",
+          cursor: hasMatch ? "pointer" : "not-allowed",
+        }}
+      >
+        Delete
+      </button>
       <br />
       <label>
         <input

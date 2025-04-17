@@ -1,12 +1,9 @@
-# React + Vite
+# 추가된 기능
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+> ## 아이템 삭제 기능
+> 
+- SearchBar에 항목을 입력하고,
+- 항목이 존재하면, Delete 버튼이 활성화되고 항목을 삭제할 수 있다.
+- 항목이 존재하지 않거나 버튼은 비활성화 상태를 유지한다.
+- 항목 삭제 후 초기 화면으로 돌아간다.
+- 이때 화면에는 삭제된 항목이 반영되어 보여진다.

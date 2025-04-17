@@ -41,7 +41,7 @@ export default function App() {
   return (
     <main>
       <AddProducts onAddProduct={handleAddProduct} />
-      <FilterableProductTable products={PRODUCTS} />
+      <FilterableProductTable products={products} />
     </main>
   );
 }

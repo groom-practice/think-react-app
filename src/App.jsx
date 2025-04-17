@@ -9,40 +9,48 @@ const PRODUCTS = [
   { category: "Vegetables", price: "$1", stocked: true, name: "Peas" },
 ];
 
-export default function App({ category, name, price, stocked }) {
+export default function App() {
   const [products, setProducts] = useState(PRODUCTS);
-  const handleAddProduct = () => {
-    const selectCategoryPrducts = products.filter(
+
+  const handleAddProduct = (category, name, price, stocked) => {
+    const selectCategoryProducts = products.filter(
       (product) => product.category === category
     );
-    const unSelectCategoryPrducts = products.filter(
+    const unSelectCategoryProducts = products.filter(
       (product) => product.category !== category
     );
-    selectCategoryPrducts.push({
+
+    selectCategoryProducts.push({
       category,
-      name,
       price,
       stocked,
+      name,
     });
-    const joinProducts = [...selectCategoryPrducts, ...unSelectCategoryPrducts];
 
-    const newProducts = [
-      ...joinProducts.filter((p) => p.category === "Fruits"),
-      ...joinProducts.filter((p) => p.category !== "Fruits"),
+    const joinProducts = [
+      ...selectCategoryProducts,
+      ...unSelectCategoryProducts,
     ];
+
+    // Fruits 카테고리의 제품을 맨 위로 올리기
+    const newProducts = [
+      ...joinProducts.filter((product) => product.category === "Fruits"),
+      ...joinProducts.filter((product) => product.category !== "Fruits"),
+    ];
+
     setProducts(newProducts);
   };
   return (
     <main>
-      <AddProduct products={products} onAddProduct={handleAddProduct} />
-      <FilterableProductTable products={products} />;
+      <AddProduct onAddProduct={handleAddProduct} />
+      <FilterableProductTable products={products} />
     </main>
   );
 }
 
-function AddProduct({ products, onAddProduct }) {
+function AddProduct({ onAddProduct }) {
   const handleSubmit = (e) => {
-    e.preventDefult();
+    e.preventDefault();
     const category = e.target[0].value;
     const name = e.target[1].value;
     const price = e.target[2].value;

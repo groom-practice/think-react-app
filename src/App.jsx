@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import "./App.css";
 
 const PRODUCTS = [
   { category: "Fruits", price: "$1", stocked: true, name: "Apple" },
@@ -8,6 +9,44 @@ const PRODUCTS = [
   { category: "Vegetables", price: "$4", stocked: false, name: "Pumpkin" },
   { category: "Vegetables", price: "$1", stocked: true, name: "Peas" },
 ];
+
+function TodaysFruitRecommendation() {
+  const [recommendedFruit, setRecommendedFruit] = useState(null);
+
+  useEffect(() => {
+    const fruits = PRODUCTS.filter(product => product.category === "Fruits");
+    
+    const today = new Date();
+    const dayOfMonth = today.getDate();
+    
+    let fruitIndex = dayOfMonth % fruits.length;
+    setRecommendedFruit(fruits[fruitIndex]);
+  }, []);
+
+  if (!recommendedFruit) {
+    return <div className="recommendation-container">Loading...</div>;
+  }
+
+  let emoji = "🍎";
+  if (recommendedFruit.name === "Apple") {
+    emoji = "🍎";
+  } else if (recommendedFruit.name === "Dragonfruit") {
+    emoji = "🐉";
+  } else if (recommendedFruit.name === "Passionfruit") {
+    emoji = "🥭";
+  }
+
+  return (
+    <div className="recommendation-container">
+      <h2>Today's Pick: {recommendedFruit.name} {emoji}</h2>
+      <div className="fruit-content">
+        <div className="fruit-info">
+          <p>Price: {recommendedFruit.price}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const [products, setProducts] = useState(PRODUCTS);
@@ -91,11 +130,16 @@ function FilterableProductTable({ products }) {
         onFilterTextChange={setFilterText}
         onInStockOnlyChange={setInStockOnly}
       />
-      <ProductTable
-        products={products}
-        filterText={filterText}
-        inStockOnly={inStockOnly}
-      />
+      <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
+        <ProductTable
+          products={products}
+          filterText={filterText}
+          inStockOnly={inStockOnly}
+        />
+        <div style={{ marginTop: "30px" }}>
+          <TodaysFruitRecommendation />
+        </div>
+      </div>
     </div>
   );
 }
@@ -183,4 +227,4 @@ function ProductRow({ product }) {
       <td>{product.price}</td>
     </tr>
   );
-}
+} 

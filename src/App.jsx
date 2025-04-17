@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const PRODUCTS = [
   { category: "Fruits", price: "$1", stocked: true, name: "Apple" },
@@ -10,7 +10,24 @@ const PRODUCTS = [
 ];
 
 export default function App() {
-  const [products, setProducts] = useState(PRODUCTS);
+  // 제품 삭제 기능 추가
+  const handleDeleteProduct = (indexToDelete) => {
+    // 배열에서 조건에 맞는 요소만 남기고 새로운 배열 만들기
+    // index는 현재 요소의 인덱스
+    // 삭제하려는 인덱스가 아닌 것만 남긴다.
+    setProducts((prev) => prev.filter((_, index) => index !== indexToDelete));
+  };
+
+  const [products, setProducts] = useState(() => {
+    // 로컬스토리지 저장 추가
+    const saved = localStorage.getItem("products");
+    return saved ? JSON.parse(saved) : PRODUCTS;
+  });
+
+  // 자꾸 안돼서 useEffect 사용하니까 되는데 왜그럴까요..
+  useEffect(() => {
+    localStorage.setItem("products", JSON.stringify(products));
+  }, [products]);
 
   const handleAddProduct = (category, name, price, stocked) => {
     const selectCategoryProducts = products.filter(
@@ -42,9 +59,12 @@ export default function App() {
   };
 
   return (
-    <main>
+    <main style={{ padding: "20px" }}>
       <AddProducts onAddProduct={handleAddProduct} />
-      <FilterableProductTable products={products} />
+      <FilterableProductTable
+        products={products}
+        onDeleteProduct={handleDeleteProduct}
+      />
     </main>
   );
 }
@@ -81,7 +101,7 @@ function AddProducts({ onAddProduct }) {
   );
 }
 
-function FilterableProductTable({ products }) {
+function FilterableProductTable({ products, onDeleteProduct }) {
   const [filterText, setFilterText] = useState("");
   const [inStockOnly, setInStockOnly] = useState(false);
   return (
@@ -96,6 +116,7 @@ function FilterableProductTable({ products }) {
         products={products}
         filterText={filterText}
         inStockOnly={inStockOnly}
+        onDeleteProduct={onDeleteProduct}
       />
     </div>
   );
@@ -128,7 +149,7 @@ function SearchBar({
   );
 }
 
-function ProductTable({ products, filterText, inStockOnly }) {
+function ProductTable({ products, filterText, inStockOnly, onDeleteProduct }) {
   const rows = [];
   let lastCategory = null;
 
@@ -150,7 +171,14 @@ function ProductTable({ products, filterText, inStockOnly }) {
         />
       );
     }
-    rows.push(<ProductRow product={product} key={product.name + index} />);
+    rows.push(
+      <ProductRow
+        product={product}
+        key={product.name + index}
+        onDeleteProduct={onDeleteProduct}
+        index={index}
+      />
+    );
     lastCategory = product.category;
   });
   return (
@@ -174,16 +202,28 @@ function ProductCategoryRow({ category }) {
   );
 }
 
-function ProductRow({ product }) {
+function ProductRow({ product, onDeleteProduct, index }) {
   const productName = product.stocked ? (
     product.name
   ) : (
     <span style={{ color: "red" }}>{product.name}</span>
   );
+
   return (
     <tr>
       <td>{productName}</td>
       <td>{product.price}</td>
+      <td>
+        {/* 
+        
+          화살표 함수를 사용해서 클릭 시 특정 동작 실행
+          onDeleteProduct를 실행하면서 index값을 인자로 전달
+          해당 항목의 인덱스를 삭제!
+        
+        */}
+        <button onClick={() => onDeleteProduct(index)}>Delete</button> &nbsp;
+        <button>Edit</button>
+      </td>
     </tr>
   );
 }

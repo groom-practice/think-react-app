@@ -6,7 +6,7 @@ function ProductRow({ product }) {
   );
   return (
     <tr>
-      <td>{productName}</td>
+      <td style={{width: "50%"}}>{productName}</td>
       <td>{product.price}</td>
     </tr>
   );

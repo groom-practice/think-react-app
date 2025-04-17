@@ -25,7 +25,7 @@ function ProductTable({ products, filterText, inStockOnly }) {
     lastCategory = product.category;
   });
   return (
-    <table>
+    <table style={{ width: "100%" }}>
       <thead>
         <tr>
           <th>Name</th>

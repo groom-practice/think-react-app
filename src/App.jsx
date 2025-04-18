@@ -1,47 +1,22 @@
-import { useState } from "react";
-import AddProducts from "./_components/AddProducts";
-import FilterableProductTable from "./_components/FilterableProductTable";
-
-const PRODUCTS = [
-  { category: "Fruits", price: "$1", stocked: true, name: "Apple" },
-  { category: "Fruits", price: "$1", stocked: true, name: "Dragonfruit" },
-  { category: "Fruits", price: "$2", stocked: false, name: "Passionfruit" },
-  { category: "Vegetables", price: "$2", stocked: true, name: "Spinach" },
-  { category: "Vegetables", price: "$4", stocked: false, name: "Pumpkin" },
-  { category: "Vegetables", price: "$1", stocked: true, name: "Peas" },
-];
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import About from "./pages/About";
+import Home from "./pages/Home";
+import "./App.css";
+import Dashboard from "./Dashboard";
+import Stats from "./Dashboard/Stats";
+import Settings from "./Dashboard/Settings";
 
 export default function App() {
-  const [products, setProducts] = useState(PRODUCTS);
-
-  const handleAddProduct = (category, name, price, stocked) => {
-    const selectCategoryProducts = products.filter(
-      (product) => product.category === category
-    );
-
-    const unSelectCategoryProducts = products.filter(
-      (product) => product.category !== category
-    );
-
-    selectCategoryProducts.push({ category, name, price, stocked });
-
-    const joinProducts = [
-      ...selectCategoryProducts,
-      ...unSelectCategoryProducts,
-    ];
-
-    const newProducts = [
-      ...joinProducts.filter((product) => product.category === "Fruits"),
-      ...joinProducts.filter((product) => product.category !== "Fruits"),
-    ];
-
-    setProducts(newProducts);
-  };
-
   return (
-    <main>
-      <AddProducts onAddProduct={handleAddProduct} />
-      <FilterableProductTable products={products} />
-    </main>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/dashboard" element={<Dashboard />}>
+          <Route path="stats" element={<Stats />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }

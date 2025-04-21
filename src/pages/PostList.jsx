@@ -1,18 +1,20 @@
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { deletePost, getAllPosts } from "../apis/posts";
 import { createPortal } from "react-dom";
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 
 export default function PostList() {
-  const [posts, setPosts] = useState([]);
+  const { allPosts } = useLoaderData();
+  const [posts, setPosts] = useState(allPosts);
   const [openModal, setOpenModal] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    getAllPosts().then((res) => {
-      setPosts(res);
-    });
-  }, []);
+  // 🚫 useLoaderData()를 활용해 useEffect사용을 줄일 수 있다.
+  // useEffect(() => {
+  //   getAllPosts().then((res) => {
+  //     setPosts(res);
+  //   });
+  // }, []);
 
   async function handleDelete() {
     if (openModal === null) return;
@@ -34,16 +36,18 @@ export default function PostList() {
   return (
     <div>
       <h3>Posts List</h3>
-      <ul>
-        {posts.map((post) => (
-          <li key={post.id}>
-            <Link to={`/posts/${post.id}`}>
-              {post.id}. {post.title}
-            </Link>
-            <button onClick={() => setOpenModal(post.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      <Suspense fallback={<p>Loading posts...</p>}>
+        <ul>
+          {allPosts.map((post) => (
+            <li key={post.id}>
+              <Link to={`/posts/${post.id}`}>
+                {post.id}. {post.title}
+              </Link>
+              <button onClick={() => setOpenModal(post.id)}>Delete</button>
+            </li>
+          ))}
+        </ul>
+      </Suspense>
 
       {openModal &&
         createPortal(

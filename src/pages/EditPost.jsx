@@ -1,4 +1,5 @@
 import {
+  useActionData,
   useLoaderData,
   useNavigate,
   useNavigation,
@@ -25,10 +26,21 @@ export default function EditPost() {
   // if (!post) return <div>Loading...</div>;
 
   const post = useLoaderData();
+  const result = useActionData(); // route에서 정의한 action 함수의 반환값 받기
+  const navigate = useNavigate();
+
+  console.log(post, result);
   return (
     <div>
-      <h2>Edit Post Id : {id}</h2>
+      <h2>Edit Post Id : {post.id}</h2>
       <PostForm post={post} />
+      {result?.error && <p style={{ color: "red" }}>{result?.error}</p>}
+      {result?.success && (
+        <div>
+          <span style={{ color: "green" }}>Post updated successfully!</span>
+          <button onClick={() => navigate(-1)}>back</button>
+        </div>
+      )}
     </div>
   );
 }

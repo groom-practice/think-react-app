@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigation } from "react-router-dom";
+import { Form, useNavigation } from "react-router-dom";
 
 export default function PostForm({
   post,
@@ -18,7 +18,7 @@ export default function PostForm({
   return (
     <div>
       <h2>PostForm</h2>
-      <form method="post">
+      <Form method="POST">
         <input
           type="text"
           name="title"
@@ -41,7 +41,7 @@ export default function PostForm({
         <button type="submit" disabled={navigation.state === "submitting"}>
           {navigation.state === "submitting" ? "Saving..." : "Save"}
         </button>
-      </form>
+      </Form>
     </div>
   );
 }

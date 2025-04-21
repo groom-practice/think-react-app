@@ -18,7 +18,8 @@ export default function PostDetail() {
   return (
     <div>
       <h3>PostDetail Page</h3>
-      <h4>Post Id : {id}</h4>
+      <h4>Post Id : {post.id}</h4>
+      <h4>User Id : {post.userId}</h4>
       <h5>{post.title}</h5>
       <p>{post.body}</p>
       <Link to={`/posts/${post.id}/edit`}>Edit</Link>

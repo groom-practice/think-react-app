@@ -25,22 +25,27 @@ const router = createBrowserRouter([
       {
         path: "posts/:id",
         element: <PostDetail />,
-        loader:
-          async () =>
-          ({ params }) =>
-            getPostById(params.id),
+        loader: async ({ params }) => getPostById(params.id),
       },
       {
         path: "posts/:id/edit",
         element: <EditPost />,
-        loader: async ({ params }) => getPostById(post.id, data),
+        loader: async ({ params }) => getPostById(params.id),
         action: async ({ params, request }) => {
           const formData = await request.formData();
-          const data = {
-            title: formData.get("title"),
-            body: formData.get("body"),
-          };
-          return updatePost(params.id, data);
+          const title = formData.get("title");
+          const body = formData.get("body");
+
+          if (!title || !body) {
+            return { error: "title, body are required" }; // useActionData()로 받을 값
+          }
+
+          try {
+            await updatePost(params.id, { title, body });
+            return { success: true };
+          } catch {
+            return { error: "Failed to update post" };
+          }
         },
       },
     ],
